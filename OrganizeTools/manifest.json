@@ -1,0 +1,10 @@
+{
+  "Name": "OrganizeTools",
+  "Author": "Cobblers",
+  "Version": "1.0.0",
+  "Description": "Puts tools in specified spots at the press of a button.",
+  "UniqueID": "cobblers.organizetools",
+  "EntryDll": "OrganizeTools.dll",
+  "MinimumApiVersion": "2.9",
+  "UpdateKeys": []
+}
