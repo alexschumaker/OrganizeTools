@@ -109,39 +109,51 @@ namespace OrganizeTools
             {
                 if (inventory[i] != null)
                 {
-                    String itemName = inventory[i].DisplayName;
-                    String itemType = inventory[i].ToString().Split('.').ToList().Last();
+                    string itemName = inventory[i].DisplayName;
+                    string itemType = inventory[i].ToString().Split('.').ToList().Last();
 
                     if (toolSlots.ContainsKey(itemType) || itemType == "MeleeWeapon" || itemType == "Slingshot")
                     {
-                        int slot;
-                        if (itemName == "Scythe")
-                            slot = toolSlots["Scythe"];
-                        else if (itemType == "MeleeWeapon" || itemType == "Slingshot")
-                            slot = toolSlots["Weapon"];
-                        else
-                            slot = toolSlots[itemType];
+                        string slot = GetSlot(itemName, itemType);
+                        int slotIndex = toolSlots[slot];
 
-                        if (slot != i)
+                        if (slotIndex != i)
                         {
                             Item temp = null;
-                            String tempType = null;
-                            if (inventory[slot] != null)
+                            string tempType = null;
+                            string tempSlot = null;
+                            if (inventory[slotIndex] != null)
                             {
-                                temp = inventory[slot];
+                                temp = inventory[slotIndex];
                                 tempType = temp.ToString().Split('.').ToList().Last();
+
+                                tempSlot = GetSlot(temp.DisplayName, tempType);
                             }
 
-                            inventory[slot] = inventory[i];
+                            inventory[slotIndex] = inventory[i];
                             inventory[i] = temp;
 
-                            if ((toolSlots.ContainsKey(itemType) || itemType == "MeleeWeapon" || itemType == "Slingshot") && tempType != itemType)
+                            Monitor.Log($"{tempSlot}, {tempType}");
+                            if (tempSlot != slot)
                                 i = i - 1;
                         }
                     }
                 }
             }
             Game1.player.setInventory(inventory);
+        }
+
+        private string GetSlot(string itemName, string itemType)
+        {
+            string slot = null;
+            if (itemName == "Scythe")
+                slot = "Scythe";
+            else if (itemType == "MeleeWeapon" || itemType == "Slingshot")
+                slot = "Weapon";
+            else
+                slot = itemType;
+
+            return slot;
         }
 
         private void DeselectSlot()
