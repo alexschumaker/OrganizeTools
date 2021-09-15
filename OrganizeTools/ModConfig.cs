@@ -22,6 +22,8 @@ namespace OrganizeTools
 
         public string CoffeeKey { get; set; } = "E";
 
+        public string TeleportKey { get; set; } = "D4";
+
         public Dictionary<string, Dictionary<int, Dictionary<string, string>>> EquipSets { get; set; } = new Dictionary<string, Dictionary<int, Dictionary<string, string>>>() { };
     }
 }

@@ -7,6 +7,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.Tools;
 
 namespace OrganizeTools
 {
@@ -22,6 +23,7 @@ namespace OrganizeTools
         private string orgKey = null;
         private string setKey = null;
         private string coffeeKey = null;
+        private string teleportKey = null;
         private Dictionary<int, Dictionary<string, string>> equipSets = null;
 
         /*********
@@ -37,6 +39,7 @@ namespace OrganizeTools
             this.orgKey = this.Config.OrgKey;
             this.setKey = this.Config.SetKey;
             this.coffeeKey = this.Config.CoffeeKey;
+            this.teleportKey = this.Config.TeleportKey;
 
             helper.Events.GameLoop.SaveLoaded += this.PlayerEnteringWorld;
             helper.Events.Input.ButtonPressed += this.OnButtonPressed;
@@ -84,6 +87,13 @@ namespace OrganizeTools
             {
                 this.Helper.Input.Suppress(e.Button);
                 drinkCoffee();
+            }
+            else if (keyPressed == teleportKey && this.Helper.Input.IsDown(SButton.LeftAlt))
+            {
+                this.Helper.Input.Suppress(e.Button);
+                this.Monitor.Log("Reached", LogLevel.Debug);
+                useTeleportWand();
+
             }
             else if (Regex.IsMatch(keyPressed, @"\b[D][0-9]\b"))
             {
@@ -146,7 +156,7 @@ namespace OrganizeTools
         private string GetSlot(string itemName, string itemType)
         {
             string slot = null;
-            if (itemName == "Scythe")
+            if (itemName == "Scythe" || itemName == "Golden Scythe")
                 slot = "Scythe";
             else if (itemType == "MeleeWeapon" || itemType == "Slingshot")
                 slot = "Weapon";
@@ -172,7 +182,7 @@ namespace OrganizeTools
                 string itemType = inventory[i]?.ToString().Split('.').ToList().Last();
                 if (itemName != null && itemType != null && (toolSlots.ContainsKey(itemType) || itemType == "MeleeWeapon"))
                 {
-                    if (itemName == "Scythe")
+                    if (itemName == "Scythe" || itemName == "Golden Scythe")
                         toolSlots["Scythe"] = i;
                     else if ((itemType == "MeleeWeapon" || itemType == "Slingshot") && !weaponIsSet)
                     {
@@ -276,6 +286,28 @@ namespace OrganizeTools
             {
                 Game1.player.eatObject((StardewValley.Object)getInventoryItemObject("Coffee"));
                 Game1.player.consumeObject(395, 1);
+            }
+        }
+
+        private void useTeleportWand()
+        {
+            if (Game1.player.hasItemInInventoryNamed("Return Scepter"))
+            {
+                int currentSelectedIndex = Game1.player.CurrentToolIndex;
+
+                List<Item> baseInventory = new List<Item>(Game1.player.Items);
+                List<Item> swappedInventory = new List<Item>(baseInventory);
+
+                // place a wand in your 0 slot, select that slot, and cast it
+                Game1.player.CurrentToolIndex = 0;
+                swappedInventory[0] = new Wand();
+                Game1.player.setInventory(swappedInventory);
+
+                Game1.pressUseToolButton();
+
+                // reset inventory and selected slot
+                Game1.player.setInventory(baseInventory);
+                Game1.player.CurrentToolIndex = currentSelectedIndex;
             }
         }
 
